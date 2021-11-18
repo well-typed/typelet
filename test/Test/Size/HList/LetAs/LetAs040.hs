@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedLabels #-}
-
 {-# OPTIONS_GHC -fplugin=TypeLet #-}
 
 module Test.Size.HList.LetAs.LetAs040 where

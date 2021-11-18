@@ -1,5 +1,4 @@
-{-# LANGUAGE CPP              #-}
-{-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE CPP #-}
 
 #if defined(USE_GHC_DUMP)
 {-# OPTIONS_GHC -fplugin=GhcDump.Plugin #-}
@@ -13,15 +12,15 @@ import Test.Size.HList.Index.Ix010
 hlist :: HList Fields
 hlist =
       -- 00 .. 09
-      HCons #i00
-    $ HCons #i01
-    $ HCons #i02
-    $ HCons #i03
-    $ HCons #i04
-    $ HCons #i05
-    $ HCons #i06
-    $ HCons #i07
-    $ HCons #i08
-    $ HCons #i09
+      HCons (MkT @"i00")
+    $ HCons (MkT @"i01")
+    $ HCons (MkT @"i02")
+    $ HCons (MkT @"i03")
+    $ HCons (MkT @"i04")
+    $ HCons (MkT @"i05")
+    $ HCons (MkT @"i06")
+    $ HCons (MkT @"i07")
+    $ HCons (MkT @"i08")
+    $ HCons (MkT @"i09")
     $ HNil
 

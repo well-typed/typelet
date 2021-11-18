@@ -5,7 +5,6 @@ module Test.Size.HList.Setup (
 
 import Data.Kind
 import GHC.TypeLits
-import GHC.OverloadedLabels
 
 data HList :: [Type] -> Type where
   HNil  :: HList '[]
@@ -13,7 +12,3 @@ data HList :: [Type] -> Type where
 
 data T :: Symbol -> Type where
   MkT :: T s
-
-instance x ~ x' => IsLabel x (T x') where
-  fromLabel = MkT
-

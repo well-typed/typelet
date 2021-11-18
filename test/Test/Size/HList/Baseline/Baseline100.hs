@@ -1,5 +1,4 @@
-{-# LANGUAGE CPP              #-}
-{-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE CPP #-}
 
 #if defined(USE_GHC_DUMP)
 {-# OPTIONS_GHC -fplugin=GhcDump.Plugin #-}
@@ -13,114 +12,114 @@ import Test.Size.HList.Index.Ix100
 hlist :: HList Fields
 hlist =
       -- 00 .. 09
-      HCons #i00
-    $ HCons #i01
-    $ HCons #i02
-    $ HCons #i03
-    $ HCons #i04
-    $ HCons #i05
-    $ HCons #i06
-    $ HCons #i07
-    $ HCons #i08
-    $ HCons #i09
+      HCons (MkT @"i00")
+    $ HCons (MkT @"i01")
+    $ HCons (MkT @"i02")
+    $ HCons (MkT @"i03")
+    $ HCons (MkT @"i04")
+    $ HCons (MkT @"i05")
+    $ HCons (MkT @"i06")
+    $ HCons (MkT @"i07")
+    $ HCons (MkT @"i08")
+    $ HCons (MkT @"i09")
       -- 10 .. 19
-    $ HCons #i10
-    $ HCons #i11
-    $ HCons #i12
-    $ HCons #i13
-    $ HCons #i14
-    $ HCons #i15
-    $ HCons #i16
-    $ HCons #i17
-    $ HCons #i18
-    $ HCons #i19
+    $ HCons (MkT @"i10")
+    $ HCons (MkT @"i11")
+    $ HCons (MkT @"i12")
+    $ HCons (MkT @"i13")
+    $ HCons (MkT @"i14")
+    $ HCons (MkT @"i15")
+    $ HCons (MkT @"i16")
+    $ HCons (MkT @"i17")
+    $ HCons (MkT @"i18")
+    $ HCons (MkT @"i19")
       -- 20 .. 29
-    $ HCons #i20
-    $ HCons #i21
-    $ HCons #i22
-    $ HCons #i23
-    $ HCons #i24
-    $ HCons #i25
-    $ HCons #i26
-    $ HCons #i27
-    $ HCons #i28
-    $ HCons #i29
+    $ HCons (MkT @"i20")
+    $ HCons (MkT @"i21")
+    $ HCons (MkT @"i22")
+    $ HCons (MkT @"i23")
+    $ HCons (MkT @"i24")
+    $ HCons (MkT @"i25")
+    $ HCons (MkT @"i26")
+    $ HCons (MkT @"i27")
+    $ HCons (MkT @"i28")
+    $ HCons (MkT @"i29")
       -- 30 .. 39
-    $ HCons #i30
-    $ HCons #i31
-    $ HCons #i32
-    $ HCons #i33
-    $ HCons #i34
-    $ HCons #i35
-    $ HCons #i36
-    $ HCons #i37
-    $ HCons #i38
-    $ HCons #i39
+    $ HCons (MkT @"i30")
+    $ HCons (MkT @"i31")
+    $ HCons (MkT @"i32")
+    $ HCons (MkT @"i33")
+    $ HCons (MkT @"i34")
+    $ HCons (MkT @"i35")
+    $ HCons (MkT @"i36")
+    $ HCons (MkT @"i37")
+    $ HCons (MkT @"i38")
+    $ HCons (MkT @"i39")
       -- 40 .. 49
-    $ HCons #i40
-    $ HCons #i41
-    $ HCons #i42
-    $ HCons #i43
-    $ HCons #i44
-    $ HCons #i45
-    $ HCons #i46
-    $ HCons #i47
-    $ HCons #i48
-    $ HCons #i49
+    $ HCons (MkT @"i40")
+    $ HCons (MkT @"i41")
+    $ HCons (MkT @"i42")
+    $ HCons (MkT @"i43")
+    $ HCons (MkT @"i44")
+    $ HCons (MkT @"i45")
+    $ HCons (MkT @"i46")
+    $ HCons (MkT @"i47")
+    $ HCons (MkT @"i48")
+    $ HCons (MkT @"i49")
       -- 50 .. 59
-    $ HCons #i50
-    $ HCons #i51
-    $ HCons #i52
-    $ HCons #i53
-    $ HCons #i54
-    $ HCons #i55
-    $ HCons #i56
-    $ HCons #i57
-    $ HCons #i58
-    $ HCons #i59
+    $ HCons (MkT @"i50")
+    $ HCons (MkT @"i51")
+    $ HCons (MkT @"i52")
+    $ HCons (MkT @"i53")
+    $ HCons (MkT @"i54")
+    $ HCons (MkT @"i55")
+    $ HCons (MkT @"i56")
+    $ HCons (MkT @"i57")
+    $ HCons (MkT @"i58")
+    $ HCons (MkT @"i59")
       -- 60 .. 69
-    $ HCons #i60
-    $ HCons #i61
-    $ HCons #i62
-    $ HCons #i63
-    $ HCons #i64
-    $ HCons #i65
-    $ HCons #i66
-    $ HCons #i67
-    $ HCons #i68
-    $ HCons #i69
+    $ HCons (MkT @"i60")
+    $ HCons (MkT @"i61")
+    $ HCons (MkT @"i62")
+    $ HCons (MkT @"i63")
+    $ HCons (MkT @"i64")
+    $ HCons (MkT @"i65")
+    $ HCons (MkT @"i66")
+    $ HCons (MkT @"i67")
+    $ HCons (MkT @"i68")
+    $ HCons (MkT @"i69")
       -- 70 .. 79
-    $ HCons #i70
-    $ HCons #i71
-    $ HCons #i72
-    $ HCons #i73
-    $ HCons #i74
-    $ HCons #i75
-    $ HCons #i76
-    $ HCons #i77
-    $ HCons #i78
-    $ HCons #i79
+    $ HCons (MkT @"i70")
+    $ HCons (MkT @"i71")
+    $ HCons (MkT @"i72")
+    $ HCons (MkT @"i73")
+    $ HCons (MkT @"i74")
+    $ HCons (MkT @"i75")
+    $ HCons (MkT @"i76")
+    $ HCons (MkT @"i77")
+    $ HCons (MkT @"i78")
+    $ HCons (MkT @"i79")
       -- 80 .. 89
-    $ HCons #i80
-    $ HCons #i81
-    $ HCons #i82
-    $ HCons #i83
-    $ HCons #i84
-    $ HCons #i85
-    $ HCons #i86
-    $ HCons #i87
-    $ HCons #i88
-    $ HCons #i89
+    $ HCons (MkT @"i80")
+    $ HCons (MkT @"i81")
+    $ HCons (MkT @"i82")
+    $ HCons (MkT @"i83")
+    $ HCons (MkT @"i84")
+    $ HCons (MkT @"i85")
+    $ HCons (MkT @"i86")
+    $ HCons (MkT @"i87")
+    $ HCons (MkT @"i88")
+    $ HCons (MkT @"i89")
       -- 90 .. 99
-    $ HCons #i90
-    $ HCons #i91
-    $ HCons #i92
-    $ HCons #i93
-    $ HCons #i94
-    $ HCons #i95
-    $ HCons #i96
-    $ HCons #i97
-    $ HCons #i98
-    $ HCons #i99
+    $ HCons (MkT @"i90")
+    $ HCons (MkT @"i91")
+    $ HCons (MkT @"i92")
+    $ HCons (MkT @"i93")
+    $ HCons (MkT @"i94")
+    $ HCons (MkT @"i95")
+    $ HCons (MkT @"i96")
+    $ HCons (MkT @"i97")
+    $ HCons (MkT @"i98")
+    $ HCons (MkT @"i99")
     $ HNil
 

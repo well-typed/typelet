@@ -1,5 +1,4 @@
-{-# LANGUAGE CPP              #-}
-{-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE CPP #-}
 
 #if defined(USE_GHC_DUMP)
 {-# OPTIONS_GHC -fplugin=GhcDump.Plugin #-}
@@ -13,37 +12,37 @@ import Test.Size.HList.Index.Ix030
 hlist :: HList Fields
 hlist =
       -- 00 .. 09
-      HCons #i00
-    $ HCons #i01
-    $ HCons #i02
-    $ HCons #i03
-    $ HCons #i04
-    $ HCons #i05
-    $ HCons #i06
-    $ HCons #i07
-    $ HCons #i08
-    $ HCons #i09
+      HCons (MkT @"i00")
+    $ HCons (MkT @"i01")
+    $ HCons (MkT @"i02")
+    $ HCons (MkT @"i03")
+    $ HCons (MkT @"i04")
+    $ HCons (MkT @"i05")
+    $ HCons (MkT @"i06")
+    $ HCons (MkT @"i07")
+    $ HCons (MkT @"i08")
+    $ HCons (MkT @"i09")
       -- 10 .. 19
-    $ HCons #i10
-    $ HCons #i11
-    $ HCons #i12
-    $ HCons #i13
-    $ HCons #i14
-    $ HCons #i15
-    $ HCons #i16
-    $ HCons #i17
-    $ HCons #i18
-    $ HCons #i19
+    $ HCons (MkT @"i10")
+    $ HCons (MkT @"i11")
+    $ HCons (MkT @"i12")
+    $ HCons (MkT @"i13")
+    $ HCons (MkT @"i14")
+    $ HCons (MkT @"i15")
+    $ HCons (MkT @"i16")
+    $ HCons (MkT @"i17")
+    $ HCons (MkT @"i18")
+    $ HCons (MkT @"i19")
       -- 20 .. 29
-    $ HCons #i20
-    $ HCons #i21
-    $ HCons #i22
-    $ HCons #i23
-    $ HCons #i24
-    $ HCons #i25
-    $ HCons #i26
-    $ HCons #i27
-    $ HCons #i28
-    $ HCons #i29
+    $ HCons (MkT @"i20")
+    $ HCons (MkT @"i21")
+    $ HCons (MkT @"i22")
+    $ HCons (MkT @"i23")
+    $ HCons (MkT @"i24")
+    $ HCons (MkT @"i25")
+    $ HCons (MkT @"i26")
+    $ HCons (MkT @"i27")
+    $ HCons (MkT @"i28")
+    $ HCons (MkT @"i29")
     $ HNil
 

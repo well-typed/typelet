@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedLabels #-}
-
 {-# OPTIONS_GHC -fplugin=TypeLet #-}
 
 module Test.Size.HList.LetAs.LetAs030 where
@@ -12,7 +10,7 @@ import Test.Size.HList.Index.Ix030
 hlist :: HList Fields
 hlist =
    -- 29 .. 20
-   case letAs (HCons (MkT @"i29") xs30) of { LetAs (xs29 :: HList t29) ->
+   case letAs (HCons (MkT @"i29") HNil) of { LetAs (xs29 :: HList t29) ->
    case letAs (HCons (MkT @"i28") xs29) of { LetAs (xs28 :: HList t28) ->
    case letAs (HCons (MkT @"i27") xs28) of { LetAs (xs27 :: HList t27) ->
    case letAs (HCons (MkT @"i26") xs27) of { LetAs (xs26 :: HList t26) ->
