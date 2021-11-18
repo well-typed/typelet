@@ -7,5 +7,6 @@ set xrange [0:100]
 # HList
 
 set output "hlist.png"
-plot "hlist-baseline.csv" using 1:5 with lines title "Baseline" \
-   , "hlist-letas.csv"    using 1:5 with lines title "LetAs"
+plot "hlist-baseline.csv"  using 1:5 with lines title "Baseline"    \
+   , "hlist-letas.csv"     using 1:5 with lines title "LetAs"       \
+   , "hlist-letas-cps.csv" using 1:5 with lines title "LetAs (CPS)"

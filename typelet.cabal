@@ -102,6 +102,16 @@ test-suite test-typelet
         Test.Size.HList.LetAs.LetAs080
         Test.Size.HList.LetAs.LetAs090
         Test.Size.HList.LetAs.LetAs100
+        Test.Size.HList.LetAsCPS.LetAsCPS010
+        Test.Size.HList.LetAsCPS.LetAsCPS020
+        Test.Size.HList.LetAsCPS.LetAsCPS030
+        Test.Size.HList.LetAsCPS.LetAsCPS040
+        Test.Size.HList.LetAsCPS.LetAsCPS050
+        Test.Size.HList.LetAsCPS.LetAsCPS060
+        Test.Size.HList.LetAsCPS.LetAsCPS070
+        Test.Size.HList.LetAsCPS.LetAsCPS080
+        Test.Size.HList.LetAsCPS.LetAsCPS090
+        Test.Size.HList.LetAsCPS.LetAsCPS100
         Test.Size.HList.Setup
     build-depends:
         base
