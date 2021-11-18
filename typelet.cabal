@@ -1,41 +1,45 @@
 cabal-version:      2.4
 name:               typelet
 version:            0.1.0.0
-
--- A short (one-line) description of the package.
--- synopsis:
-
--- A longer description of the package.
--- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-
--- The license under which the package is released.
--- license:
+synopsis:           Plugin to faciliate type-level let
+description:        For a certain class of programs, type-level let is essential
+                    in order to be able to write these programs in such a way
+                    that they do not result in ghc core that is quadratic in
+                    size. Type-level let is not explicitly supported in ghc,
+                    but we can encode it. The @typelet@ library provides a
+                    type-checker plugin that makes the encoding more convenient
+                    to use as well as more effective.
+bug-reports:        https://github.com/well-typed/typelet/issues
+license:            BSD-3-Clause
 author:             Edsko de Vries
 maintainer:         edsko@well-typed.com
-
--- A copyright notice.
--- copyright:
--- category:
+copyright:          Well-Typed LLP, Juspay Technologies Pvt Ltd
+category:           Plugin
 extra-source-files: CHANGELOG.md
 
 library
-    exposed-modules:  MyLib
+    exposed-modules:
+        TypeLet
+    other-modules:
+        TypeLet.Plugin
+        TypeLet.UserAPI
+    other-extensions:
+    build-depends:
+        base >= 4.13 && < 4.14
+    hs-source-dirs:
+        src
+    default-language:
+        Haskell2010
 
-    -- Modules included in this library but not exported.
-    -- other-modules:
-
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
-    build-depends:    base ^>=4.13.0.0
-    hs-source-dirs:   src
-    default-language: Haskell2010
-
-test-suite typelet-test
-    default-language: Haskell2010
-    type:             exitcode-stdio-1.0
-    hs-source-dirs:   test
-    main-is:          MyLibTest.hs
-    build-depends:    base ^>=4.13.0.0
+test-suite test-typelet
+    default-language:
+        Haskell2010
+    type:
+        exitcode-stdio-1.0
+    hs-source-dirs:
+        test
+    main-is:
+        TestTypeLet.hs
+    build-depends:
+        base
+      , typelet
