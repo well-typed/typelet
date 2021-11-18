@@ -92,6 +92,16 @@ test-suite test-typelet
         Test.Size.Ap.Index.Ix080
         Test.Size.Ap.Index.Ix090
         Test.Size.Ap.Index.Ix100
+        Test.Size.Ap.Let.Let010
+        Test.Size.Ap.Let.Let020
+        Test.Size.Ap.Let.Let030
+        Test.Size.Ap.Let.Let040
+        Test.Size.Ap.Let.Let050
+        Test.Size.Ap.Let.Let060
+        Test.Size.Ap.Let.Let070
+        Test.Size.Ap.Let.Let080
+        Test.Size.Ap.Let.Let090
+        Test.Size.Ap.Let.Let100
         Test.Size.HList.Baseline.Baseline010
         Test.Size.HList.Baseline.Baseline020
         Test.Size.HList.Baseline.Baseline030

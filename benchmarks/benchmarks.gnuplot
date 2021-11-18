@@ -14,7 +14,7 @@ plot "hlist-baseline.csv"  using 1:5 with lines title "Baseline"    \
 # HList
 
 set output "ap.png"
-plot "ap-baseline.csv"  using 1:5 with lines title "Baseline"
+plot "ap-baseline.csv" using 1:5 with lines title "Baseline" \
+   , "ap-let.csv"      using 1:5 with lines title "Let"
 
-#   , "hlist-letas.csv"     using 1:5 with lines title "LetAs"       \
 #   , "hlist-letas-cps.csv" using 1:5 with lines title "LetAs (CPS)"
