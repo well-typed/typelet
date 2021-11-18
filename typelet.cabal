@@ -61,9 +61,14 @@ test-suite test-typelet
         GADTs
         KindSignatures
         MultiParamTypeClasses
+        PolyKinds
+        RankNTypes
         ScopedTypeVariables
+        StandaloneDeriving
         TypeApplications
+        TypeFamilies
         TypeOperators
+        UndecidableInstances
     type:
         exitcode-stdio-1.0
     hs-source-dirs:
