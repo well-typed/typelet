@@ -10,8 +10,8 @@ module Test.Size.HList.LetAsCPS.LetAsCPS050 where
 
 import TypeLet
 
-import Test.Size.HList.Setup
 import Test.Size.HList.Index.Ix050
+import Test.Size.Setup
 
 hlist :: HList Fields
 hlist = letT' (Proxy @Fields) $ \(_ :: Proxy r) -> castEqual $

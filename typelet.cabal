@@ -112,7 +112,7 @@ test-suite test-typelet
         Test.Size.HList.LetAsCPS.LetAsCPS080
         Test.Size.HList.LetAsCPS.LetAsCPS090
         Test.Size.HList.LetAsCPS.LetAsCPS100
-        Test.Size.HList.Setup
+        Test.Size.Setup
     build-depends:
         base
       , typelet

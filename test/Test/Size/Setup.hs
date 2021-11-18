@@ -1,4 +1,4 @@
-module Test.Size.HList.Setup (
+module Test.Size.Setup (
     HList(..)
   , T(..)
   ) where

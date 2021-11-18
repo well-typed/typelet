@@ -6,8 +6,8 @@
 
 module Test.Size.HList.Baseline.Baseline050 where
 
-import Test.Size.HList.Setup
 import Test.Size.HList.Index.Ix050
+import Test.Size.Setup
 
 hlist :: HList Fields
 hlist =
