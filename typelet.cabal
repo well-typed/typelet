@@ -76,6 +76,7 @@ test-suite test-typelet
     main-is:
         TestTypeLet.hs
     other-modules:
+        Test.Invalid
         Test.Sanity
         Test.Size.Ap.Baseline.Baseline010
         Test.Size.Ap.Baseline.Baseline020

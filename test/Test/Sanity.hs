@@ -1,9 +1,7 @@
 {-# OPTIONS_GHC -fplugin=TypeLet #-}
--- {-# OPTIONS_GHC -fdefer-type-errors -Wwarn=deferred-type-errors #-}
 
 module Test.Sanity (tests) where
 
-import Control.Exception
 import Data.Functor.Identity
 
 import TypeLet
@@ -21,9 +19,6 @@ tests = testGroup "Test.Sanity" [
         , testProperty  "singleLet"   $ castIsId castSingleLet
         , testProperty  "singleLetAs" $ castIsId castSingleLetAs
         ]
-    , testGroup "invalid" [
-          testCase "notEqual" $ expectTypeError castNotEqual
-        ]
     , testGroup "HList" [
           testCase "LetAs"    $ testHList hlistLetAs
         , testCase "LetAsCPS" $ testHList hlistLetAsCPS
@@ -35,13 +30,6 @@ tests = testGroup "Test.Sanity" [
 
 castIsId :: (Eq a, Show a, Arbitrary a) => (a -> a) -> a -> Property
 castIsId f x = x === f x
-
-expectTypeError :: forall a. a -> Assertion
-expectTypeError x = do
-    mErr :: Either SomeException a <- try $ evaluate x
-    case mErr of
-      Left _err -> return () -- TODO: Should we be more precise?
-      Right _a' -> assertFailure "Expected type error"
 
 testHList :: HList '[T "i00", T "i01", T "i02"] -> Assertion
 testHList =
@@ -66,10 +54,6 @@ testAp apTest =
 -- (they are, just don't have a test for them currently)
 castReflexive :: Int -> Int
 castReflexive = castEqual
-
--- | Test that we cannot cast between different types
-castNotEqual :: Int -> Bool
-castNotEqual = undefined -- castEqual
 
 -- | Introduce single let binding, then cast there and back
 castSingleLet :: Int -> Int
