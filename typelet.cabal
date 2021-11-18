@@ -22,14 +22,35 @@ library
         TypeLet
     other-modules:
         TypeLet.Plugin
+        TypeLet.Plugin.Constraints
+        TypeLet.Plugin.NameResolution
+        TypeLet.Plugin.Substitution
+        TypeLet.Plugin.Util
         TypeLet.UserAPI
-    other-extensions:
     build-depends:
         base >= 4.13 && < 4.14
+
+        -- TODO: bounds
+      , containers
+
+        -- whichever version is bundled with ghc:
+      , ghc
     hs-source-dirs:
         src
     default-language:
         Haskell2010
+    default-extensions:
+        FlexibleInstances
+        GADTs
+        KindSignatures
+        MultiParamTypeClasses
+        PolyKinds
+        RankNTypes
+        RecordWildCards
+        ScopedTypeVariables
+    other-extensions:
+    ghc-options:
+        -Wall
 
 test-suite test-typelet
     default-language:
