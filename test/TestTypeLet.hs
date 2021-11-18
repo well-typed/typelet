@@ -1,4 +1,10 @@
 module Main (main) where
 
+import Test.Tasty
+
+import qualified Test.Sanity
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented."
+main = defaultMain $ testGroup "TestTypeLet" [
+      Test.Sanity.tests
+    ]

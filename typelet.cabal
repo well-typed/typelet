@@ -20,13 +20,13 @@ extra-source-files: CHANGELOG.md
 library
     exposed-modules:
         TypeLet
+        TypeLet.UserAPI
     other-modules:
         TypeLet.Plugin
         TypeLet.Plugin.Constraints
         TypeLet.Plugin.NameResolution
         TypeLet.Plugin.Substitution
         TypeLet.Plugin.Util
-        TypeLet.UserAPI
     build-depends:
         base >= 4.13 && < 4.14
 
@@ -55,12 +55,22 @@ library
 test-suite test-typelet
     default-language:
         Haskell2010
+    default-extensions:
+        ScopedTypeVariables
+        TypeApplications
     type:
         exitcode-stdio-1.0
     hs-source-dirs:
         test
     main-is:
         TestTypeLet.hs
+    other-modules:
+        Test.Sanity
     build-depends:
         base
       , typelet
+      , tasty
+      , tasty-hunit
+      , tasty-quickcheck
+    ghc-options:
+        -Wall

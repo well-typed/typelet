@@ -24,19 +24,20 @@ instance Outputable ResolvedNames where
 
 resolveNames :: TcPluginM ResolvedNames
 resolveNames = do
-    m <- do r <- findImportedModule userApiModule (Just packageName)
+    m <- do r <- findImportedModule typeletMod (Just typeletPkg)
             case r of
               Found _ m  -> return m
-              _otherwise -> panic "Could not find module TypeLet.UserAPI"
+              _otherwise -> panic $ "Could not find "
+                                 ++ showSDocUnsafe (ppr typeletMod)
 
     clsEqual <- tcLookupClass =<< lookupOrig m (mkTcOcc "Equal")
     clsLet   <- tcLookupClass =<< lookupOrig m (mkTcOcc "Let")
 
     return ResolvedNames{..}
   where
-    userApiModule :: ModuleName
-    userApiModule = mkModuleName "TypeLet.UserAPI"
+    typeletMod :: ModuleName
+    typeletMod = mkModuleName "TypeLet.UserAPI"
 
-    packageName :: FastString
-    packageName = fsLit "typelet"
+    typeletPkg :: FastString
+    typeletPkg = fsLit "typelet"
 
