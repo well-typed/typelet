@@ -72,6 +72,16 @@ test-suite test-typelet
         TestTypeLet.hs
     other-modules:
         Test.Sanity
+        Test.Size.Ap.Index.Ix010
+        Test.Size.Ap.Index.Ix020
+        Test.Size.Ap.Index.Ix030
+        Test.Size.Ap.Index.Ix040
+        Test.Size.Ap.Index.Ix050
+        Test.Size.Ap.Index.Ix060
+        Test.Size.Ap.Index.Ix070
+        Test.Size.Ap.Index.Ix080
+        Test.Size.Ap.Index.Ix090
+        Test.Size.Ap.Index.Ix100
         Test.Size.HList.Baseline.Baseline010
         Test.Size.HList.Baseline.Baseline020
         Test.Size.HList.Baseline.Baseline030
