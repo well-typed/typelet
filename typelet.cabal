@@ -72,6 +72,15 @@ test-suite test-typelet
         TestTypeLet.hs
     other-modules:
         Test.Sanity
+        Test.Size.HList.Baseline.Baseline010
+        Test.Size.HList.Baseline.Baseline020
+        Test.Size.HList.Baseline.Baseline030
+        Test.Size.HList.Baseline.Baseline040
+        Test.Size.HList.Baseline.Baseline050
+        Test.Size.HList.Baseline.Baseline060
+        Test.Size.HList.Baseline.Baseline070
+        Test.Size.HList.Baseline.Baseline080
+        Test.Size.HList.Baseline.Baseline090
         Test.Size.HList.Baseline.Baseline100
         Test.Size.HList.Index.Ix010
         Test.Size.HList.Index.Ix020
@@ -92,3 +101,13 @@ test-suite test-typelet
       , tasty-quickcheck
     ghc-options:
         -Wall
+
+    if flag(use-ghc-dump)
+      cpp-options:
+          -DUSE_GHC_DUMP
+      build-depends:
+          ghc-dump-core
+
+Flag use-ghc-dump
+  Description: Use ghc-dump (for size measurements)
+  Default: False
