@@ -92,6 +92,16 @@ test-suite test-typelet
         Test.Size.HList.Index.Ix080
         Test.Size.HList.Index.Ix090
         Test.Size.HList.Index.Ix100
+        Test.Size.HList.LetAs.LetAs010
+        Test.Size.HList.LetAs.LetAs020
+        Test.Size.HList.LetAs.LetAs030
+        Test.Size.HList.LetAs.LetAs040
+        Test.Size.HList.LetAs.LetAs050
+        Test.Size.HList.LetAs.LetAs060
+        Test.Size.HList.LetAs.LetAs070
+        Test.Size.HList.LetAs.LetAs080
+        Test.Size.HList.LetAs.LetAs090
+        Test.Size.HList.LetAs.LetAs100
         Test.Size.HList.Setup
     build-depends:
         base
