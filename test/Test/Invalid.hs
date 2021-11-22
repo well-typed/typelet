@@ -5,6 +5,7 @@
 module Test.Invalid (tests) where
 
 import Control.Exception
+import Data.List (isInfixOf)
 
 import TypeLet
 
@@ -13,15 +14,20 @@ import Test.Tasty.HUnit
 
 tests :: TestTree
 tests = testGroup "Test.Invalid" [
-      testCase "notEqual" $ expectTypeError castNotEqual
+      testCase "notEqual" $ expectException intBoolMismatch castNotEqual
     ]
+  where
+    intBoolMismatch :: String -> Bool
+    intBoolMismatch e = "Int" `isInfixOf` e && "Bool" `isInfixOf` e
 
-expectTypeError :: forall a. a -> Assertion
-expectTypeError x = do
+expectException :: forall a. (String -> Bool) -> a -> Assertion
+expectException p x = do
     mErr :: Either SomeException a <- try $ evaluate x
     case mErr of
-      Left _err -> return () -- TODO: Should we be more precise?
-      Right _a' -> assertFailure "Expected type error"
+      Left err ->
+        assertBool "Exception does not match predicate" (p $ show err)
+      Right _a' ->
+        assertFailure $ "Expected exception, but got value"
 
 castNotEqual :: Int -> Bool
 castNotEqual = castEqual
