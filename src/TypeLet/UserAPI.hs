@@ -77,7 +77,7 @@ data LetT (a :: k) where
 --
 -- Usage:
 --
--- > case (Proxy @t) of LetT (_ :: Proxy x) ->
+-- > case letT (Proxy @t) of LetT (_ :: Proxy x) ->
 --
 -- This introduces a type-level let binding @x = t@.
 letT :: Proxy a -> LetT a
