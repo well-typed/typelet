@@ -6,10 +6,16 @@ module TypeLet.Plugin.NameResolution (
 import GHC
 import GhcPlugins
 import TcPluginM
+import PrelNames
 
 data ResolvedNames = ResolvedNames {
-      clsEqual :: Class
-    , clsLet   :: Class
+      clsEqual     :: Class
+    , clsLet       :: Class
+    , tyConTypeErr :: TyCon
+    , tyConText    :: TyCon
+    , tyConShow    :: TyCon
+    , tyConConcat  :: TyCon
+    , tyConVCat    :: TyCon
     }
 
 instance Outputable ResolvedNames where
@@ -30,8 +36,19 @@ resolveNames = do
               _otherwise -> panic $ "Could not find "
                                  ++ showSDocUnsafe (ppr typeletMod)
 
+    -- Constraints handled by the plugin
+
     clsEqual <- tcLookupClass =<< lookupOrig m (mkTcOcc "Equal")
     clsLet   <- tcLookupClass =<< lookupOrig m (mkTcOcc "Let")
+
+    -- Constructors for custom error messages
+    -- (Adopted from @initBuiltinDefs@ in @ghc-tcplugin-api@)
+
+    tyConTypeErr <-                    tcLookupTyCon   errorMessageTypeErrorFamName
+    tyConText    <- promoteDataCon <$> tcLookupDataCon typeErrorTextDataConName
+    tyConShow    <- promoteDataCon <$> tcLookupDataCon typeErrorShowTypeDataConName
+    tyConConcat  <- promoteDataCon <$> tcLookupDataCon typeErrorAppendDataConName
+    tyConVCat    <- promoteDataCon <$> tcLookupDataCon typeErrorVAppendDataConName
 
     return ResolvedNames{..}
   where

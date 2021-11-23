@@ -1,4 +1,5 @@
 cabal-version:      2.4
+build-type:         Custom
 name:               typelet
 version:            0.1.0.0
 synopsis:           Plugin to faciliate type-level let
@@ -17,13 +18,19 @@ copyright:          Well-Typed LLP, Juspay Technologies Pvt Ltd
 category:           Plugin
 extra-source-files: CHANGELOG.md
 
+custom-setup
+    setup-depends:
+        base >= 4 && <5
+      , cabal-doctest >= 1 && <1.1
+
 library
     exposed-modules:
         TypeLet
         TypeLet.UserAPI
-    other-modules:
         TypeLet.Plugin
+    other-modules:
         TypeLet.Plugin.Constraints
+        TypeLet.Plugin.Errors
         TypeLet.Plugin.NameResolution
         TypeLet.Plugin.Substitution
         TypeLet.Plugin.Util
@@ -43,12 +50,14 @@ library
         FlexibleInstances
         GADTs
         KindSignatures
+        LambdaCase
         MultiParamTypeClasses
         PolyKinds
         RankNTypes
         RecordWildCards
         ScopedTypeVariables
     other-extensions:
+        OverloadedStrings
     ghc-options:
         -Wall
 
@@ -57,6 +66,7 @@ test-suite test-typelet
         Haskell2010
     default-extensions:
         DataKinds
+        FlexibleContexts
         FlexibleInstances
         GADTs
         KindSignatures
@@ -76,7 +86,6 @@ test-suite test-typelet
     main-is:
         TestTypeLet.hs
     other-modules:
-        Test.Invalid
         Test.Sanity
         Test.Size.Ap.Baseline.Baseline010
         Test.Size.Ap.Baseline.Baseline020
@@ -164,6 +173,48 @@ test-suite test-typelet
       build-depends:
           ghc-dump-core
 
+-- To use the doctest tests, enable flag build-doctest-examples
+test-suite doctest-typelet
+    type:
+        exitcode-stdio-1.0
+    default-language:
+        Haskell2010
+    hs-source-dirs:
+        doctest
+    main-is:
+        DoctestTypeLet.hs
+    build-depends:
+        base
+      , doctest
+      , typelet
+    x-doctest-components:
+        exe:doctest-examples-typelet
+
+    if !flag(build-doctest-examples)
+      buildable: False
+
+executable doctest-examples-typelet
+    main-is:
+        DoctestExamplesTypeLet.hs
+    default-language:
+        Haskell2010
+    default-extensions:
+        FlexibleContexts
+    hs-source-dirs:
+        doctest-examples
+    build-depends:
+        base
+      , typelet
+    ghc-options:
+        -Wwarn
+
+    if !flag(build-doctest-examples)
+      buildable: False
+
 Flag use-ghc-dump
   Description: Use ghc-dump (for size measurements)
+  Default: False
+
+Flag build-doctest-examples
+  Description: Build doctest-examples-typelet (for testing only)
   Default: False
