@@ -115,8 +115,8 @@ simpleMismatch = ()
 -- ...Let with non-variable LHS:
 -- ...Let Int Int
 -- ...
-letWithNonVarLS :: ()
-letWithNonVarLS = ()
+letWithNonVarLHS :: ()
+letWithNonVarLHS = ()
 
 {-------------------------------------------------------------------------------
   Sanity check
