@@ -1,6 +1,5 @@
 module TypeLet.Plugin (plugin) where
 
-import Data.Maybe (catMaybes, mapMaybe)
 import Data.Traversable (forM)
 
 import GhcPlugins hiding (substTy)
@@ -59,23 +58,24 @@ simplifyGivens _st _given = return $ TcPluginOk [] []
 -- 'cast' to resolve @Let@ bindings, but not additionally work as 'coerce'.
 simplifyWanteds :: ResolvedNames -> [Ct] -> [Ct] -> TcPluginM TcPluginResult
 simplifyWanteds rn@ResolvedNames{..} given wanted = do
-    (solved, new) <- fmap (unzip . catMaybes) $ forM wanted $ \w ->
-      case parseEqual rn w of
-        Just w' -> do
-          ev <- setCtLocM' (ctLoc w) $
-                  newWanted (ctLoc w) $
-                    mkPrimEqPredRole
-                      Nominal
-                      (substTy subst (equalLHS w'))
-                      (substTy subst (equalRHS w'))
-          return $ Just (
-              (evidenceEqual rn w', w)
-            , mkNonCanonical ev
-            )
-        Nothing ->
-          return Nothing
-    return $ TcPluginOk solved new
-  where
-    subst :: TCvSubst
-    subst = letsToSubst $ mapMaybe (parseLet rn) given
+    case parseAll (parseLet rn) given of
+      Left (ct, err) -> do
+        err' <- setCtLocM' (ctLoc ct) $ newWanted (ctLoc ct) $
+                  formatInvalidLet rn err
+        return $ TcPluginContradiction [mkNonCanonical err']
+      Right lets -> do
+        let subst :: TCvSubst
+            subst = letsToSubst (map snd lets)
+        (solved, new) <- fmap unzip $
+          forM (parseAll' (parseEqual rn) wanted) $ \(w, w') -> do
+              ev <- setCtLocM' (ctLoc w) $ newWanted (ctLoc w) $ do
+                      mkPrimEqPredRole
+                        Nominal
+                        (substTy subst (equalLHS w'))
+                        (substTy subst (equalRHS w'))
+              return (
+                  (evidenceEqual rn w', w)
+                , mkNonCanonical ev
+                )
+        return $ TcPluginOk solved new
 

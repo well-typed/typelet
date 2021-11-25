@@ -38,10 +38,17 @@ class Let (a :: k) (b :: k)
 
 -- | Reflexivity
 --
--- This instance is used internally in the plugin by 'letT' and 'letAs'. It
--- should not be relied on in user code: 'Let' constraints that are not of the
--- form @Let x t@, for some type variable @x@, will result in a panic in the
--- plugin when solving @Equal@ constraints.
+-- A constraint @Let x t@, where @x@ is an existential (skolem) type variable
+-- and @t@ is an arbitrary type, models a type-level @let x = t@. There is only
+-- a single instance for @Let@: reflexivity (a type is equal to itself).
+--
+-- User code normally does not work with @Let@ directly, but instead uses one of
+-- the introduction forms ('letT' and 'letAs') which take care to introduce
+-- @Let@ constraints of the right shape. When @Let@ constraints are introduced
+-- manually, the plugin will report a type error if
+--
+-- * The left-hand side is not a skolem type variable
+-- * The set of let-bindings in scope are cyclic.
 instance Let a a
 
 -- | (Nominal) type equality, up to type-level let
