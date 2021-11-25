@@ -109,6 +109,7 @@ simpleMismatch = ()
 -- rather than anything the plugin does: the more doctest test cases I add, the
 -- more often I see the error repeated. In regular (non-doctest) code I don't
 -- see those repeats.
+--
 -- >>> let aux :: Let Int Int => () ; aux = castEqual () in aux
 -- ...
 -- ...Let with non-variable LHS:
