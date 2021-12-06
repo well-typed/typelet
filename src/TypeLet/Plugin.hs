@@ -1,8 +1,11 @@
 module TypeLet.Plugin (plugin) where
 
+import Prelude hiding (cycle)
+
 import Data.Traversable (forM)
 
 import GhcPlugins hiding (substTy)
+import TcEvidence
 import TcPluginM
 import TcRnTypes
 import TyCoRep (substTy)
@@ -59,23 +62,44 @@ simplifyGivens _st _given = return $ TcPluginOk [] []
 simplifyWanteds :: ResolvedNames -> [Ct] -> [Ct] -> TcPluginM TcPluginResult
 simplifyWanteds rn@ResolvedNames{..} given wanted = do
     case parseAll (parseLet rn) given of
-      Left (ct, err) -> do
-        err' <- setCtLocM' (ctLoc ct) $ newWanted (ctLoc ct) $
-                  formatInvalidLet rn err
-        return $ TcPluginContradiction [mkNonCanonical err']
+      Left err ->
+        errWith $ formatInvalidLet rn <$> err
       Right lets -> do
-        let subst :: TCvSubst
-            subst = letsToSubst (map snd lets)
-        (solved, new) <- fmap unzip $
-          forM (parseAll' (parseEqual rn) wanted) $ \(w, w') -> do
-              ev <- setCtLocM' (ctLoc w) $ newWanted (ctLoc w) $ do
-                      mkPrimEqPredRole
-                        Nominal
-                        (substTy subst (equalLHS w'))
-                        (substTy subst (equalRHS w'))
-              return (
-                  (evidenceEqual rn w', w)
-                , mkNonCanonical ev
-                )
-        return $ TcPluginOk solved new
+        case letsToSubst lets of
+          Left cycle ->
+            errWith $ formatLetCycle rn cycle
+          Right subst -> do
+            (solved, new) <- fmap unzip $
+              forM (parseAll' (withOrig (parseEqual rn)) wanted) $
+                uncurry (solveEqual subst)
+            return $ TcPluginOk solved new
+  where
+    errWith :: GenLocated CtLoc PredType -> TcPluginM TcPluginResult
+    errWith (L l err) = mkErr <$> newWanted' l err
+      where
+        mkErr :: CtEvidence -> TcPluginResult
+        mkErr = TcPluginContradiction . (:[]) . mkNonCanonical
+
+    -- Work-around bug in ghc, making sure the location is set correctly
+    newWanted' :: CtLoc -> PredType -> TcPluginM CtEvidence
+    newWanted' l w = setCtLocM' l $ newWanted l w
+
+    -- Solve an Equal constraint by applying the substitution and turning it
+    -- into a nominal equality constraint
+    solveEqual ::
+         TCvSubst
+      -> Ct                       -- Original Equal constraint
+      -> GenLocated CtLoc CEqual  -- Parsed Equal constraint
+      -> TcPluginM ((EvTerm, Ct), Ct)
+    solveEqual subst orig (L l parsed) = do
+        ev <- newWanted l $
+                mkPrimEqPredRole
+                  Nominal
+                  (substTy subst (equalLHS parsed))
+                  (substTy subst (equalRHS parsed))
+        return (
+            (evidenceEqual rn parsed, orig)
+          , mkNonCanonical ev
+          )
+
 
