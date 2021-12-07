@@ -24,10 +24,10 @@ module TypeLet.Plugin.Constraints (
 import Data.Bifunctor
 import Data.Void
 
-import Outputable
-import TcRnTypes
 import GhcPlugins
 import TcEvidence
+import TcRnTypes
+import TcType
 
 import TypeLet.Plugin.NameResolution
 import TypeLet.Plugin.Errors
@@ -108,6 +108,13 @@ data InvalidLet =
     -- | LHS should always be a variable
     NonVariableLHS Type Type Type
 
+    -- | The LHS should be a /skolem/ variable
+    --
+    -- As for as ghc is concerned, the LHS should be an opaque type variable
+    -- with unknown value (only the plugin knows); certainly, ghc should not
+    -- try to unify it with anything.
+  | NonSkolemLHS Type TyVar Type
+
 parseLet ::
      ResolvedNames
   -> Ct
@@ -116,8 +123,12 @@ parseLet ResolvedNames{..} ct = bimap (L $ ctLoc ct) (L $ ctLoc ct) $
     case classifyPredType (ctPred ct) of
       ClassPred cls [k, a, b] | cls == clsLet ->
         case getTyVar_maybe a of
-          Nothing -> ParseError $ NonVariableLHS k a b
-          Just x  -> ParseOk    $ CLet           k x b
+          Nothing ->
+            ParseError $ NonVariableLHS k a b
+          Just x  ->
+            if isSkolemTyVar x
+              then ParseOk    $ CLet         k x b
+              else ParseError $ NonSkolemLHS k x b
       _otherwise ->
         ParseNoMatch
 
@@ -162,6 +173,8 @@ formatCLet (CLet _ a b) =
 formatInvalidLet :: ResolvedNames -> InvalidLet -> PredType
 formatInvalidLet rn = mkTcPluginErrorTy rn . \case
     NonVariableLHS _k a b ->
-          "Let with non-variable LHS:"
-      :-: "Let " :|: PrintType a :|: " " :|: PrintType b
-
+          "Let with non-variable LHS: "
+      :|: PrintType a :|: " := " :|: PrintType b
+    NonSkolemLHS _k a b ->
+          "Let with non-skolem LHS: "
+      :|: PrintType (mkTyVarTy a) :|: " := " :|: PrintType b

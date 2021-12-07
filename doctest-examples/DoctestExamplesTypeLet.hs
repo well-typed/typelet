@@ -85,6 +85,7 @@ import TypeLet
 
 -- $setup
 -- >>> :set -fplugin=TypeLet
+-- >>> :set -XScopedTypeVariables
 
 {-------------------------------------------------------------------------------
   Tests proper
@@ -113,8 +114,7 @@ simpleMismatch = ()
 --
 -- >>> let aux :: Let Int Int => () ; aux = castEqual () in aux
 -- ...
--- ...Let with non-variable LHS:
--- ...Let Int Int
+-- ...Let with non-variable LHS: Int := Int
 -- ...
 letWithNonVarLHS :: ()
 letWithNonVarLHS = ()
@@ -134,13 +134,27 @@ letWithNonVarLHS = ()
 --   in cycle ('a', 'b')
 -- :}
 -- ...
--- ...Cycle in type-level let bindings...
--- ...a := b, b := a...
+-- ...Cycle in type-level let bindings: a := b, b := a
 -- ...
 letCycle :: ()
 letCycle = ()
 
--- TODO: test for non-skolem var
+-- | Non-skolem LHS
+--
+-- See 'NonSkolemLHS' for details.
+--
+-- >>> :{
+--   \(x :: a) ->
+--     let
+--       y :: Let a Integer => a
+--       y = castEqual (1 :: Integer)
+--     in y
+-- :}
+-- ...
+-- ...Let with non-skolem LHS: a := Integer
+-- ...
+letWithNonSkolemLHS :: ()
+letWithNonSkolemLHS = ()
 
 {-------------------------------------------------------------------------------
   Sanity check

@@ -97,8 +97,8 @@ formatLetCycle ::
   -> GenLocated CtLoc PredType
 formatLetCycle rn (Cycle vs@(L l _ :| _)) = L l $
     mkTcPluginErrorTy rn $
-          "Cycle in type-level let bindings:"
-      :-: ( foldr1 (:|:)
+          "Cycle in type-level let bindings: "
+      :|: ( foldr1 (:|:)
           . intersperse ", "
           . map (\(L _ l') -> formatCLet l')
           $ toList vs
