@@ -1,21 +1,36 @@
-module TypeLet.Plugin.Substitution (letsToSubst) where
+{-# LANGUAGE OverloadedStrings #-}
+
+module TypeLet.Plugin.Substitution (
+    letsToSubst
+  , Cycle(..)
+  , formatLetCycle
+  ) where
 
 import Data.Bifunctor
+import Data.Foldable (toList)
+import Data.List (intersperse)
+import Data.List.NonEmpty (NonEmpty(..))
+import Data.Maybe (mapMaybe)
 
 import qualified Data.Graph as G
 
 import GhcPlugins
+import TcRnTypes
 
 import TypeLet.Plugin.Constraints
+import TypeLet.Plugin.Errors
+import TypeLet.Plugin.NameResolution
 
 -- | Construct idempotent substitution
 --
 -- TODO: Not entirely sure if this is correct, might be too simplistic and/or an
 -- abuse of the ghc API; it is a /whole/ lot simpler than @niFixTCvSubst@, which
--- is disconcerning.  Hwever, it seems to work for the examples so far; perhaps
+-- is disconcerning. However, it seems to work for the examples so far; perhaps
 -- our use case is simpler? Needs more thought.
-letsToSubst :: [CLet] -> TCvSubst
-letsToSubst = uncurry zipTvSubst . unzip . go [] . inorder
+letsToSubst ::
+     [GenLocated CtLoc CLet]
+  -> Either (Cycle (GenLocated CtLoc CLet)) TCvSubst
+letsToSubst = fmap (uncurry zipTvSubst . unzip . go []) . inorder
   where
     go :: [(TyVar, Type)] -> [(TyVar, Type)] -> [(TyVar, Type)]
     go acc []         = acc
@@ -44,23 +59,64 @@ letsToSubst = uncurry zipTvSubst . unzip . go [] . inorder
 -- > (y := yT) -----> (x := xT)
 --
 -- The required assignment ordering is then obtained by topological sort.
-inorder :: [CLet] -> [(TyVar, Type)]
+inorder ::
+     [GenLocated CtLoc CLet]
+  -> Either (Cycle (GenLocated CtLoc CLet)) [(TyVar, Type)]
 inorder lets =
-    [ (x, t)
-    | (CLet _ x t, _, _) <- map nodeFromVertex $ G.topSort graph
-    ]
+    case cycles edges of
+      c:_ -> Left c
+      []  -> Right $ [
+          (x, t)
+        | (L _ (CLet _ x t), _, _) <- map nodeFromVertex $ G.topSort graph
+        ]
   where
     graph          :: G.Graph
-    nodeFromVertex :: G.Vertex -> (CLet, TyVar, [TyVar])
+    nodeFromVertex :: G.Vertex -> (GenLocated CtLoc CLet, TyVar, [TyVar])
     _vertexFromKey :: TyVar -> Maybe G.Vertex
-    (graph, nodeFromVertex, _vertexFromKey) = G.graphFromEdges [
+    (graph, nodeFromVertex, _vertexFromKey) = G.graphFromEdges edges
+
+    edges :: [(GenLocated CtLoc CLet, TyVar, [TyVar])]
+    edges = [
         ( l
         , y
         , [ x
-          | CLet _ x _ <- lets
+          | L _ (CLet _ x _) <- lets
           , x `elemVarSet` (tyCoVarsOfType yT)
           ]
         )
-      | l@(CLet _ y yT) <- lets -- variables name match description above
+      | l@(L _ (CLet _ y yT)) <- lets -- variables name match description above
       ]
 
+-- | Format a cycle
+--
+-- We (arbitrarily) pick the first 'CLet' in the cycle for the location of the
+-- error.
+formatLetCycle ::
+     ResolvedNames
+  -> Cycle (GenLocated CtLoc CLet)
+  -> GenLocated CtLoc PredType
+formatLetCycle rn (Cycle vs@(L l _ :| _)) = L l $
+    mkTcPluginErrorTy rn $
+          "Cycle in type-level let bindings:"
+      :-: ( foldr1 (:|:)
+          . intersperse ", "
+          . map (\(L _ l') -> formatCLet l')
+          $ toList vs
+          )
+
+{-------------------------------------------------------------------------------
+  Auxiliary
+-------------------------------------------------------------------------------}
+
+-- | Cycle in a graph
+data Cycle a = Cycle (NonEmpty a)
+
+cycles :: Ord key => [(node, key, [key])] -> [Cycle node]
+cycles = mapMaybe aux . G.stronglyConnComp
+  where
+    aux :: G.SCC a -> Maybe (Cycle a)
+    aux (G.AcyclicSCC _) = Nothing
+    aux (G.CyclicSCC vs) =
+        case vs of
+          v:vs'      -> Just $ Cycle (v :| vs')
+          _otherwise -> Nothing

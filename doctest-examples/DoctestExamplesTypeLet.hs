@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fplugin=TypeLet #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 -- | Doctests to verify the plugin's custom type errors
 --
@@ -117,6 +118,29 @@ simpleMismatch = ()
 -- ...
 letWithNonVarLHS :: ()
 letWithNonVarLHS = ()
+
+-- | Recursive let bindings
+--
+-- I'm not actually sure how these could arise in practice, especially when we
+-- have the skolem check in place as well. But perhaps it's possible with some
+-- cunning scheme where we introduce regular (unification) variables that then
+-- unify to skolem variables? For now we err on the side of caution and detect
+-- this explicitly; we /may/ want to reconsider that at some point if the check
+-- turns out to be expensive in practice.
+--
+-- >>> :{
+--   let cycle :: (Let a b, Let b a) => (a, b) -> (a, b)
+--       cycle (a, b) = (castEqual b, castEqual a)
+--   in cycle ('a', 'b')
+-- :}
+-- ...
+-- ...Cycle in type-level let bindings...
+-- ...a := b, b := a...
+-- ...
+letCycle :: ()
+letCycle = ()
+
+-- TODO: test for non-skolem var
 
 {-------------------------------------------------------------------------------
   Sanity check
