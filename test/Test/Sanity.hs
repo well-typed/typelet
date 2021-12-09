@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fplugin=TypeLet #-}
+-- {-# OPTIONS_GHC -ddump-ds-preopt -ddump-ds -ddump-simpl -ddump-to-file #-}
 
 module Test.Sanity (tests) where
 
@@ -10,7 +11,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
 
-import Test.Size.Setup
+import Test.Infra
 
 tests :: TestTree
 tests = testGroup "Test.Sanity" [
@@ -31,17 +32,17 @@ tests = testGroup "Test.Sanity" [
 castIsId :: (Eq a, Show a, Arbitrary a) => (a -> a) -> a -> Property
 castIsId f x = x === f x
 
-testHList :: HList '[T "i00", T "i01", T "i02"] -> Assertion
+testHList :: HList '[A, B, C] -> Assertion
 testHList =
     assertEqual "" hlistBaseline
 
 testAp ::
-     (forall f r. Applicative f => (T "i00" -> T "i01" -> T "i02" -> r) -> f r)
+     (forall f r. Applicative f => (A -> B -> C -> r) -> f r)
   -> Assertion
 testAp apTest =
     assertEqual "" (runIdentity $ apBaseline f) (runIdentity $ apTest f)
   where
-    f :: T "i00" -> T "i01" -> T "i02" -> HList '[T "i00", T "i01", T "i02"]
+    f :: A -> B -> C -> HList '[A, B, C]
     f x y z = HCons x $ HCons y $ HCons z $ HNil
 
 {-------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ castReflexive = castEqual
 castSingleLet :: Int -> Int
 castSingleLet x =
     case letT (Proxy @Int) of
-      LetT (_p :: Proxy t1) ->
+      LetT (_ :: Proxy t1) ->
         let y :: t1
             y = castEqual x
         in castEqual y
@@ -78,46 +79,46 @@ castSingleLetAs x =
   easy experimentation.
 -------------------------------------------------------------------------------}
 
-hlistBaseline :: HList '[T "i00", T "i01", T "i02"]
+{-# NOINLINE hlistBaseline #-}
+hlistBaseline :: HList '[A, B, C]
 hlistBaseline =
-      -- 00 .. 09
-      HCons (MkT @"i00")
-    $ HCons (MkT @"i01")
-    $ HCons (MkT @"i02")
+      HCons A
+    $ HCons B
+    $ HCons C
     $ HNil
 
-hlistLetAs :: HList '[T "i00", T "i01", T "i02"]
+hlistLetAs :: HList '[A, B, C]
 hlistLetAs =
-    case letAs (HCons (MkT @"i02") HNil) of { LetAs (xs02 :: HList t02) ->
-    case letAs (HCons (MkT @"i01") xs02) of { LetAs (xs01 :: HList t01) ->
-    case letAs (HCons (MkT @"i00") xs01) of { LetAs (xs00 :: HList t00) ->
+    case letAs (HCons C HNil) of { LetAs (xs02 :: HList t02) ->
+    case letAs (HCons B xs02) of { LetAs (xs01 :: HList t01) ->
+    case letAs (HCons A xs01) of { LetAs (xs00 :: HList t00) ->
       castEqual xs00
     }}}
 
-hlistLetAsCPS :: HList '[T "i00", T "i01", T "i02"]
+hlistLetAsCPS :: HList '[A, B, C]
 hlistLetAsCPS =
-    letT' (Proxy @'[T "i00", T "i01", T "i02"]) $ \(_ :: Proxy r) -> castEqual $
-      letAs' @(HList r) (HCons (MkT @"i02") HNil) $ \(xs02 :: HList t02) ->
-      letAs' @(HList r) (HCons (MkT @"i01") xs02) $ \(xs01 :: HList t01) ->
-      letAs' @(HList r) (HCons (MkT @"i00") xs01) $ \(xs00 :: HList t00) ->
+    letT' (Proxy @'[A, B, C]) $ \(_ :: Proxy r) -> castEqual $
+      letAs' @(HList r) (HCons C HNil) $ \(xs02 :: HList t02) ->
+      letAs' @(HList r) (HCons B xs02) $ \(xs01 :: HList t01) ->
+      letAs' @(HList r) (HCons A xs01) $ \(xs00 :: HList t00) ->
         castEqual xs00
 
 {-------------------------------------------------------------------------------
   Similarly, small versions of the @<*>@ tests.
 -------------------------------------------------------------------------------}
 
-apBaseline :: Applicative f => (T "i00" -> T "i01" -> T "i02" -> r) -> f r
+apBaseline :: Applicative f => (A -> B -> C -> r) -> f r
 apBaseline f =
         pure f
-    <*> pure (MkT @"i00")
-    <*> pure (MkT @"i01")
-    <*> pure (MkT @"i02")
+    <*> pure A
+    <*> pure B
+    <*> pure C
 
-apLet :: forall f r. Applicative f => (T "i00" -> T "i01" -> T "i02" -> r) -> f r
+apLet :: forall f r. Applicative f => (A -> B -> C -> r) -> f r
 apLet f =
-    case letT (Proxy @(T "i02" -> r))   of { LetT (_ :: Proxy l02) ->
-    case letT (Proxy @(T "i01" -> l02)) of { LetT (_ :: Proxy l01) ->
-    case letT (Proxy @(T "i00" -> l01)) of { LetT (_ :: Proxy l00) ->
+    case letT (Proxy @(C -> r))   of { LetT (_ :: Proxy l02) ->
+    case letT (Proxy @(B -> l02)) of { LetT (_ :: Proxy l01) ->
+    case letT (Proxy @(A -> l01)) of { LetT (_ :: Proxy l00) ->
 
       let f00 :: f l00
           f01 :: f l01
@@ -126,9 +127,9 @@ apLet f =
           res :: f r
 
           f00 = pure (castEqual f)
-          f01 = castEqual f00 <*> pure (MkT @"i00")
-          f02 = castEqual f01 <*> pure (MkT @"i01")
-          res = castEqual f02 <*> pure (MkT @"i02")
+          f01 = castEqual f00 <*> pure A
+          f02 = castEqual f01 <*> pure B
+          res = castEqual f02 <*> pure C
 
       in res
 

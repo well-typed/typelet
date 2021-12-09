@@ -10,8 +10,8 @@ module Test.Size.HList.LetAs.LetAs030 where
 
 import TypeLet
 
+import Test.Infra
 import Test.Size.HList.Index.Ix030
-import Test.Size.Setup
 
 hlist :: HList Fields
 hlist =

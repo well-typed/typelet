@@ -10,8 +10,8 @@ module Test.Size.Ap.Let.Let040 where
 
 import TypeLet
 
+import Test.Infra
 import Test.Size.Ap.Index.Ix040
-import Test.Size.Setup
 
 applyF :: forall f r. Applicative f => F r -> f r
 applyF f =

@@ -1,6 +1,6 @@
 module Test.Size.Ap.Index.Ix040 (F) where
 
-import Test.Size.Setup
+import Test.Infra
 
 type F r =
        -- 00 .. 09

@@ -6,8 +6,8 @@
 
 module Test.Size.Ap.Baseline.Baseline050 where
 
+import Test.Infra
 import Test.Size.Ap.Index.Ix050
-import Test.Size.Setup
 
 applyF :: Applicative f => F r -> f r
 applyF f =
