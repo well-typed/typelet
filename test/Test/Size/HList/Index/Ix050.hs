@@ -2,7 +2,7 @@ module Test.Size.HList.Index.Ix050 (Fields) where
 
 import Data.Kind
 
-import Test.Size.Setup
+import Test.Infra
 
 type Fields = '[
       -- 00 .. 09

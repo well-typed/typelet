@@ -1,6 +1,9 @@
-module Test.Size.Setup (
+module Test.Infra (
     HList(..)
   , T(..)
+  , A(..)
+  , B(..)
+  , C(..)
   ) where
 
 import Data.Kind
@@ -13,6 +16,10 @@ data HList :: [Type] -> Type where
 data T :: Symbol -> Type where
     MkT :: T s
   deriving (Show, Eq)
+
+data A = A deriving (Show, Eq)
+data B = B deriving (Show, Eq)
+data C = C deriving (Show, Eq)
 
 {-------------------------------------------------------------------------------
   Infrastructure for testing
