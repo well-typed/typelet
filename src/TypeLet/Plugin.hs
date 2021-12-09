@@ -92,14 +92,26 @@ simplifyWanteds rn@ResolvedNames{..} given wanted = do
       -> GenLocated CtLoc CEqual  -- Parsed Equal constraint
       -> TcPluginM ((EvTerm, Ct), Ct)
     solveEqual subst orig (L l parsed) = do
-        ev <- newWanted l $
-                mkPrimEqPredRole
-                  Nominal
-                  (substTy subst (equalLHS parsed))
-                  (substTy subst (equalRHS parsed))
-        return (
-            (evidenceEqual rn parsed, orig)
-          , mkNonCanonical ev
-          )
+        lhs <- zonkTcType $ equalLHS parsed
+        rhs <- zonkTcType $ equalRHS parsed
+        ev  <- newWanted l $
+                 mkPrimEqPredRole
+                   Nominal
+                   (substTy subst lhs)
+                   (substTy subst rhs)
+        trace (unlines [
+            "*** solveEqual: "
+          , "parsed:     " ++ _showSDocUnsafe (ppr parsed)
+          , "subst:      " ++ _showSDocUnsafe (ppr subst)
+          , "lhs:        " ++ _showSDocUnsafe (ppr lhs)
+          , "rhs:        " ++ _showSDocUnsafe (ppr rhs)
+          , "subst(lhs): " ++ _showSDocUnsafe (ppr (substTy subst lhs))
+          , "subst(rhs): " ++ _showSDocUnsafe (ppr (substTy subst rhs))
+          ]) $
+          return (
+              (evidenceEqual rn parsed, orig)
+            , mkNonCanonical ev
+            )
 
-
+_showSDocUnsafe :: SDoc -> String
+_showSDocUnsafe = showSDocDebug unsafeGlobalDynFlags

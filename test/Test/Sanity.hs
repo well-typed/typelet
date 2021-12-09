@@ -1,9 +1,11 @@
 {-# OPTIONS_GHC -fplugin=TypeLet #-}
 -- {-# OPTIONS_GHC -ddump-ds-preopt -ddump-ds -ddump-simpl -ddump-to-file #-}
+{-# OPTIONS_GHC -ddump-tc-trace -ddump-to-file #-}
 
 module Test.Sanity (tests) where
 
 import Data.Functor.Identity
+import Data.Kind
 
 import TypeLet
 
@@ -14,7 +16,7 @@ import Test.Tasty.QuickCheck
 import Test.Infra
 
 tests :: TestTree
-tests = testGroup "Test.Sanity" [
+tests = testGroup "Test.Sanity" [] {-
       testGroup "simple" [
           testProperty  "reflexive"   $ castIsId castReflexive
         , testProperty  "singleLet"   $ castIsId castSingleLet
@@ -44,27 +46,37 @@ testAp apTest =
   where
     f :: A -> B -> C -> HList '[A, B, C]
     f x y z = HCons x $ HCons y $ HCons z $ HNil
+-}
 
 {-------------------------------------------------------------------------------
   Simple casts
 -------------------------------------------------------------------------------}
 
+{-
 -- | Trivial test: no let-bounds
 --
 -- TODO: We should also make sure that non-type correct functions are rejected
 -- (they are, just don't have a test for them currently)
 castReflexive :: Int -> Int
 castReflexive = castEqual
+-}
 
 -- | Introduce single let binding, then cast there and back
 castSingleLet :: Int -> Int
 castSingleLet x =
-    case letT (Proxy @Int) of
-      LetT (_ :: Proxy t1) ->
+    -- TODO: the kind annotation is necessary because without it, the
+    -- unification variable t1 does not unify with the skolem variable for
+    -- the existential before the plugin runs, and as a consequence when the
+    -- plugin applies the substitution, nothing happens (the substitution would
+    -- replace the skolem variable with @Int@, but since @t1@ hasn't unified
+    -- with that skolem variable yet, nothing happens).
+    case letT @Type (Proxy) of -- @Int) of
+      LetT (_ :: t1 := Int) ->
         let y :: t1
             y = castEqual x
-        in castEqual y
+        in undefined -- castEqual y
 
+{-
 -- | Single let-as
 castSingleLetAs :: Identity Int -> Identity Int
 castSingleLetAs x =
@@ -134,3 +146,4 @@ apLet f =
       in res
 
     }}}
+-}
