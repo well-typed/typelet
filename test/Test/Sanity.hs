@@ -21,7 +21,8 @@ tests = testGroup "Test.Sanity" [
         , testProperty  "singleLetAs" $ castIsId castSingleLetAs
         ]
     , testGroup "HList" [
-          testCase "LetAs"    $ testHList hlistLetAs
+          testCase "Let"      $ testHList hlistLet
+        , testCase "LetAs"    $ testHList hlistLetAs
         , testCase "LetAsCPS" $ testHList hlistLetAsCPS
         ]
     , testGroup "Ap" [
@@ -86,6 +87,23 @@ hlistBaseline =
     $ HCons B
     $ HCons C
     $ HNil
+
+hlistLet :: HList '[A, B, C]
+hlistLet =
+    case letT (Proxy @(C : '[])) of { LetT (_ :: Proxy r2) ->
+    case letT (Proxy @(B : r2))  of { LetT (_ :: Proxy r1) ->
+    case letT (Proxy @(A : r1))  of { LetT (_ :: Proxy r0) ->
+
+     let xs2 :: HList r2
+         xs1 :: HList r1
+         xs0 :: HList r0
+
+         xs2 = castEqual (HCons C HNil)
+         xs1 = castEqual (HCons B xs2)
+         xs0 = castEqual (HCons A xs1)
+
+     in castEqual xs0
+    }}}
 
 hlistLetAs :: HList '[A, B, C]
 hlistLetAs =
