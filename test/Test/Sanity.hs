@@ -21,9 +21,10 @@ tests = testGroup "Test.Sanity" [
         , testProperty  "singleLetAs" $ castIsId castSingleLetAs
         ]
     , testGroup "HList" [
-          testCase "Let"      $ testHList hlistLet
-        , testCase "LetAs"    $ testHList hlistLetAs
-        , testCase "LetAsCPS" $ testHList hlistLetAsCPS
+          testCase "Let"          $ testHList hlistLet
+        , testCase "LetAs"        $ testHList hlistLetAs
+        , testCase "LetAsCPS_bad" $ testHList hlistLetAsCPS_bad
+        , testCase "LetAsCPS"     $ testHList hlistLetAsCPS
         ]
     , testGroup "Ap" [
           testCase "Let" $ testAp apLet
@@ -112,6 +113,13 @@ hlistLetAs =
     case letAs (HCons A xs01) of { LetAs (xs00 :: HList t00) ->
       castEqual xs00
     }}}
+
+hlistLetAsCPS_bad :: HList '[A, B, C]
+hlistLetAsCPS_bad =
+    letAs' (HCons C HNil) $ \(xs02 :: HList t02) ->
+    letAs' (HCons B xs02) $ \(xs01 :: HList t01) ->
+    letAs' (HCons A xs01) $ \(xs00 :: HList t00) ->
+      castEqual xs00
 
 hlistLetAsCPS :: HList '[A, B, C]
 hlistLetAsCPS =
