@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module TypeLet.Plugin.Substitution (
     letsToSubst
   , Cycle(..)
@@ -14,12 +12,8 @@ import Data.Maybe (mapMaybe)
 
 import qualified Data.Graph as G
 
-import GhcPlugins
-import TcRnTypes
-
 import TypeLet.Plugin.Constraints
-import TypeLet.Plugin.Errors
-import TypeLet.Plugin.NameResolution
+import TypeLet.Plugin.GhcTcPluginAPI
 
 -- | Construct idempotent substitution
 --
@@ -92,14 +86,12 @@ inorder lets =
 -- We (arbitrarily) pick the first 'CLet' in the cycle for the location of the
 -- error.
 formatLetCycle ::
-     ResolvedNames
-  -> Cycle (GenLocated CtLoc CLet)
-  -> GenLocated CtLoc PredType
-formatLetCycle rn (Cycle vs@(L l _ :| _)) = L l $
-    mkTcPluginErrorTy rn $
-          "Cycle in type-level let bindings: "
+     Cycle (GenLocated CtLoc CLet)
+  -> GenLocated CtLoc TcPluginErrorMessage
+formatLetCycle (Cycle vs@(L l _ :| _)) = L l $
+          Txt "Cycle in type-level let bindings: "
       :|: ( foldr1 (:|:)
-          . intersperse ", "
+          . intersperse (Txt ", ")
           . map (\(L _ l') -> formatCLet l')
           $ toList vs
           )

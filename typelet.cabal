@@ -30,23 +30,22 @@ library
         TypeLet.Plugin
     other-modules:
         TypeLet.Plugin.Constraints
-        TypeLet.Plugin.Errors
+        TypeLet.Plugin.GhcTcPluginAPI
         TypeLet.Plugin.NameResolution
         TypeLet.Plugin.Substitution
-        TypeLet.Plugin.Util
     build-depends:
-        base >= 4.13 && < 4.14
+        base >= 4.13 && < 4.15
+      , ghc-tcplugin-api >= 0.6 && < 0.7
 
-        -- TODO: bounds
+        -- whichever versions are bundled with ghc:
       , containers
-
-        -- whichever version is bundled with ghc:
       , ghc
     hs-source-dirs:
         src
     default-language:
         Haskell2010
     default-extensions:
+        DataKinds
         DeriveFunctor
         FlexibleInstances
         GADTs
@@ -58,8 +57,6 @@ library
         RecordWildCards
         ScopedTypeVariables
         TupleSections
-    other-extensions:
-        OverloadedStrings
     ghc-options:
         -Wall
 

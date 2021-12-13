@@ -4,16 +4,12 @@ import Prelude hiding (cycle)
 
 import Data.Traversable (forM)
 
-import GhcPlugins hiding (substTy)
-import TcEvidence
-import TcPluginM
-import TcRnTypes
-import TyCoRep (substTy)
+import GHC.Plugins (Plugin(..), defaultPlugin, purePlugin)
 
 import TypeLet.Plugin.Constraints
+import TypeLet.Plugin.GhcTcPluginAPI
 import TypeLet.Plugin.NameResolution
 import TypeLet.Plugin.Substitution
-import TypeLet.Plugin.Util
 
 {-------------------------------------------------------------------------------
   Top-level plumbing
@@ -22,11 +18,12 @@ import TypeLet.Plugin.Util
 plugin :: Plugin
 plugin = defaultPlugin {
       pluginRecompile  = purePlugin
-    , tcPlugin         = \_cmdline -> Just TcPlugin {
-                             tcPluginInit  = resolveNames
-                           , tcPluginSolve = solve
-                           , tcPluginStop  = const $ return ()
-                           }
+    , tcPlugin         = \_cmdline -> Just . mkTcPlugin $ TcPlugin {
+                               tcPluginInit    = resolveNames
+                             , tcPluginSolve   = solve
+                             , tcPluginRewrite = \_st -> emptyUFM
+                             , tcPluginStop    = \_st -> return ()
+                             }
     }
 
 {-------------------------------------------------------------------------------
@@ -41,16 +38,19 @@ plugin = defaultPlugin {
 -- | Main interface to constraint resolution
 --
 -- NOTE: For now we are completely ignoring the derived constraints.
-solve :: ResolvedNames -> [Ct] -> [Ct] -> [Ct] -> TcPluginM TcPluginResult
-solve rn given derived wanted
-    | null derived && null wanted = simplifyGivens  rn given
-    | otherwise                   = simplifyWanteds rn given wanted
+solve :: ResolvedNames -> TcPluginSolver
+solve rn given wanted
+  | null wanted = simplifyGivens rn given
+  | otherwise   = simplifyWanteds rn given wanted
 
 -- | Simplify givens
 --
 -- We (currently?) never simplify any givens, so we just two empty lists,
 -- indicating that there no constraints were removed and none got added.
-simplifyGivens :: ResolvedNames -> [Ct] -> TcPluginM TcPluginResult
+simplifyGivens ::
+     ResolvedNames  -- ^ Result of name resolution (during init)
+  -> [Ct]           -- ^ Given constraints
+  -> TcPluginM 'Solve TcPluginSolveResult
 simplifyGivens _st _given = return $ TcPluginOk [] []
 
 -- | Simplify wanteds
@@ -59,30 +59,38 @@ simplifyGivens _st _given = return $ TcPluginOk [] []
 --
 -- We resolve 'Equal' constraints to /nominal/ equality constraints: we want
 -- 'cast' to resolve @Let@ bindings, but not additionally work as 'coerce'.
-simplifyWanteds :: ResolvedNames -> [Ct] -> [Ct] -> TcPluginM TcPluginResult
-simplifyWanteds rn@ResolvedNames{..} given wanted = do
+simplifyWanteds ::
+     ResolvedNames  -- ^ Result of name resolution (during init)
+  -> [Ct]           -- ^ Given constraints
+  -> [Ct]           -- ^ Wanted constraints
+  -> TcPluginM 'Solve TcPluginSolveResult
+simplifyWanteds rn given wanted = do
     case parseAll (parseLet rn) given of
       Left err ->
-        errWith $ formatInvalidLet rn <$> err
+        errWith $ formatInvalidLet <$> err
       Right lets -> do
         case letsToSubst lets of
           Left cycle ->
-            errWith $ formatLetCycle rn cycle
+            errWith $ formatLetCycle cycle
           Right subst -> do
             (solved, new) <- fmap unzip $
               forM (parseAll' (withOrig (parseEqual rn)) wanted) $
                 uncurry (solveEqual subst)
             return $ TcPluginOk solved new
   where
-    errWith :: GenLocated CtLoc PredType -> TcPluginM TcPluginResult
-    errWith (L l err) = mkErr <$> newWanted' l err
-      where
-        mkErr :: CtEvidence -> TcPluginResult
-        mkErr = TcPluginContradiction . (:[]) . mkNonCanonical
-
     -- Work-around bug in ghc, making sure the location is set correctly
-    newWanted' :: CtLoc -> PredType -> TcPluginM CtEvidence
-    newWanted' l w = setCtLocM' l $ newWanted l w
+    newWanted' :: CtLoc -> PredType -> TcPluginM 'Solve CtEvidence
+    newWanted' l w = setCtLocM l $ newWanted l w
+
+    errWith ::
+         GenLocated CtLoc TcPluginErrorMessage
+      -> TcPluginM 'Solve TcPluginSolveResult
+    errWith (L l err) = do
+        errAsTyp <- mkTcPluginErrorTy err
+        mkErr <$> newWanted' l errAsTyp
+      where
+        mkErr :: CtEvidence -> TcPluginSolveResult
+        mkErr = TcPluginContradiction . (:[]) . mkNonCanonical
 
     -- Solve an Equal constraint by applying the substitution and turning it
     -- into a nominal equality constraint
@@ -90,9 +98,9 @@ simplifyWanteds rn@ResolvedNames{..} given wanted = do
          TCvSubst
       -> Ct                       -- Original Equal constraint
       -> GenLocated CtLoc CEqual  -- Parsed Equal constraint
-      -> TcPluginM ((EvTerm, Ct), Ct)
+      -> TcPluginM 'Solve ((EvTerm, Ct), Ct)
     solveEqual subst orig (L l parsed) = do
-        ev <- newWanted l $
+        ev <- newWanted' l $
                 mkPrimEqPredRole
                   Nominal
                   (substTy subst (equalLHS parsed))
@@ -101,5 +109,3 @@ simplifyWanteds rn@ResolvedNames{..} given wanted = do
             (evidenceEqual rn parsed, orig)
           , mkNonCanonical ev
           )
-
-
