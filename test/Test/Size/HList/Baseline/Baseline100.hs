@@ -1,9 +1,3 @@
-{-# LANGUAGE CPP #-}
-
-#if defined(USE_GHC_DUMP)
-{-# OPTIONS_GHC -fplugin=GhcDump.Plugin #-}
-#endif
-
 module Test.Size.HList.Baseline.Baseline100 where
 
 import Test.Infra
