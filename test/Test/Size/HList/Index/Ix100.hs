@@ -1,7 +1,5 @@
 module Test.Size.HList.Index.Ix100 (Fields) where
 
-import Data.Kind
-
 import Test.Infra
 
 type Fields = '[
@@ -115,4 +113,4 @@ type Fields = '[
     , T "i97"
     , T "i98"
     , T "i99"
-    ] :: [Type]
+    ]

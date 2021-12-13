@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module TypeLet.Plugin.Constraints (
     -- * Constraints recognized by the plugin
     CEqual(..)
@@ -24,13 +22,8 @@ module TypeLet.Plugin.Constraints (
 import Data.Bifunctor
 import Data.Void
 
-import GhcPlugins
-import TcEvidence
-import TcRnTypes
-import TcType
-
+import TypeLet.Plugin.GhcTcPluginAPI
 import TypeLet.Plugin.NameResolution
-import TypeLet.Plugin.Errors
 
 {-------------------------------------------------------------------------------
   Constraints recognized by the plugin
@@ -167,14 +160,13 @@ evidenceEqual ResolvedNames{..} (CEqual k a b) =
 formatCLet :: CLet -> TcPluginErrorMessage
 formatCLet (CLet _ a b) =
         PrintType (mkTyVarTy a)
-    :|: " := "
+    :|: Txt " := "
     :|: PrintType b
 
-formatInvalidLet :: ResolvedNames -> InvalidLet -> PredType
-formatInvalidLet rn = mkTcPluginErrorTy rn . \case
-    NonVariableLHS _k a b ->
-          "Let with non-variable LHS: "
-      :|: PrintType a :|: " := " :|: PrintType b
-    NonSkolemLHS _k a b ->
-          "Let with non-skolem LHS: "
-      :|: PrintType (mkTyVarTy a) :|: " := " :|: PrintType b
+formatInvalidLet :: InvalidLet -> TcPluginErrorMessage
+formatInvalidLet (NonVariableLHS _k a b) =
+        Txt "Let with non-variable LHS: "
+    :|: PrintType a :|: Txt " := " :|: PrintType b
+formatInvalidLet (NonSkolemLHS _k a b) =
+        Txt "Let with non-skolem LHS: "
+    :|: PrintType (mkTyVarTy a) :|: Txt " := " :|: PrintType b

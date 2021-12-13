@@ -3,19 +3,11 @@ module TypeLet.Plugin.NameResolution (
   , resolveNames
   ) where
 
-import GHC
-import GhcPlugins
-import TcPluginM
-import PrelNames
+import TypeLet.Plugin.GhcTcPluginAPI
 
 data ResolvedNames = ResolvedNames {
-      clsEqual     :: Class
-    , clsLet       :: Class
-    , tyConTypeErr :: TyCon
-    , tyConText    :: TyCon
-    , tyConShow    :: TyCon
-    , tyConConcat  :: TyCon
-    , tyConVCat    :: TyCon
+      clsEqual :: Class
+    , clsLet   :: Class
     }
 
 instance Outputable ResolvedNames where
@@ -28,7 +20,7 @@ instance Outputable ResolvedNames where
       , text "}"
       ]
 
-resolveNames :: TcPluginM ResolvedNames
+resolveNames :: TcPluginM 'Init ResolvedNames
 resolveNames = do
     m <- do r <- findImportedModule typeletMod (Just typeletPkg)
             case r of
@@ -40,15 +32,6 @@ resolveNames = do
 
     clsEqual <- tcLookupClass =<< lookupOrig m (mkTcOcc "Equal")
     clsLet   <- tcLookupClass =<< lookupOrig m (mkTcOcc "Let")
-
-    -- Constructors for custom error messages
-    -- (Adopted from @initBuiltinDefs@ in @ghc-tcplugin-api@)
-
-    tyConTypeErr <-                    tcLookupTyCon   errorMessageTypeErrorFamName
-    tyConText    <- promoteDataCon <$> tcLookupDataCon typeErrorTextDataConName
-    tyConShow    <- promoteDataCon <$> tcLookupDataCon typeErrorShowTypeDataConName
-    tyConConcat  <- promoteDataCon <$> tcLookupDataCon typeErrorAppendDataConName
-    tyConVCat    <- promoteDataCon <$> tcLookupDataCon typeErrorVAppendDataConName
 
     return ResolvedNames{..}
   where
