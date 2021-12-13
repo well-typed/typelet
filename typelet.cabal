@@ -34,7 +34,7 @@ library
         TypeLet.Plugin.NameResolution
         TypeLet.Plugin.Substitution
     build-depends:
-        base >= 4.13 && < 4.15
+        base >= 4.13 && < 4.17
       , ghc-tcplugin-api >= 0.6 && < 0.7
 
         -- whichever versions are bundled with ghc:
@@ -57,6 +57,8 @@ library
         RecordWildCards
         ScopedTypeVariables
         TupleSections
+    other-extensions:
+        CPP
     ghc-options:
         -Wall
 
