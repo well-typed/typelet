@@ -1,6 +1,7 @@
 module TypeLet.UserAPI (
     -- * Main classes
-    Let
+    (:=)(..)
+  , Let
   , Equal
   , castEqual
     -- * Introduction forms
@@ -34,7 +35,7 @@ import Unsafe.Coerce (unsafeCoerce)
 -- o Elimination form
 --
 --   To eliminate type-level let, use 'castEqual'.
-class Let (a :: k) (b :: k)
+class Let (a :: ka) (b :: kb)
 
 -- | Reflexivity
 --
@@ -74,11 +75,14 @@ castEqual = unsafeCoerce
   Introduction forms
 -------------------------------------------------------------------------------}
 
+-- | Proxy witnessing equality between two types
+data (a :: ka) := (b :: kb) = ProxyEqual
+
 -- | 'LetT' is used along with 'letT' to introduce type-level let bindings.
 --
 -- See 'letT' for more information.
-data LetT (a :: k) where
-  LetT :: Let b a => Proxy b -> LetT a
+data LetT (a :: ka) where
+  LetT :: forall (a :: ka) (b :: kb). Let b a => b := a -> LetT a
 
 -- | Primitive way to introduce type-level let binding.
 --
@@ -87,14 +91,14 @@ data LetT (a :: k) where
 -- > case letT (Proxy @t) of LetT (_ :: Proxy x) ->
 --
 -- This introduces a type-level let binding @x = t@.
-letT :: Proxy a -> LetT a
-letT p = LetT p
+letT :: forall ka (a ::ka).Proxy a -> LetT a
+letT _p = LetT (ProxyEqual :: a := a)
 
 -- | CPS form of 'letT'
 --
 -- While this is more convenient to use, the @r@ parameter itself requires
 -- careful thought.
-letT' :: forall r a. Proxy a -> (forall b. Let b a => Proxy b -> r) -> r
+letT' :: forall r ka (a :: ka). Proxy a -> (forall kb (b :: kb). Let b a => b := a -> r) -> r
 letT' pa k = case letT pa of LetT pb -> k pb
 
 -- | Used together with 'letAs' to pair a type-level let binding with a cast
