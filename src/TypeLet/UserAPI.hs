@@ -35,7 +35,7 @@ import Unsafe.Coerce (unsafeCoerce)
 -- o Elimination form
 --
 --   To eliminate type-level let, use 'castEqual'.
-class Let (a :: ka) (b :: kb)
+class ka ~ kb => Let (a :: ka) (b :: kb)
 
 -- | Reflexivity
 --
