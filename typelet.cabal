@@ -175,12 +175,6 @@ test-suite test-typelet
     ghc-options:
         -Wall
 
-    if flag(use-ghc-dump)
-      cpp-options:
-          -DUSE_GHC_DUMP
-      build-depends:
-          ghc-dump-core
-
 -- To use the doctest tests, enable flag build-doctest-examples
 test-suite doctest-typelet
     type:
@@ -218,10 +212,6 @@ executable doctest-examples-typelet
 
     if !flag(build-doctest-examples)
       buildable: False
-
-Flag use-ghc-dump
-  Description: Use ghc-dump (for size measurements)
-  Default: False
 
 Flag build-doctest-examples
   Description: Build doctest-examples-typelet (for testing only)

@@ -1,9 +1,3 @@
-{-# LANGUAGE CPP #-}
-
-#if defined(USE_GHC_DUMP)
-{-# OPTIONS_GHC -fplugin=GhcDump.Plugin #-}
-#endif
-
 {-# OPTIONS_GHC -fplugin=TypeLet #-}
 
 module Test.Size.HList.LetAs.LetAs030 where

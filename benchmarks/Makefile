@@ -2,21 +2,25 @@ default:
 
 csv:
 	# ds
-	
-	ghc-dump summarize `find ../.. -name '*-0000.cbor'` | parse-ghc-dump-summary --sort --filter 'HList/Baseline/Baseline' --file-is-number >hlist-baseline.csv
-	ghc-dump summarize `find ../.. -name '*-0000.cbor'` | parse-ghc-dump-summary --sort --filter 'HList/LetAs/LetAs'       --file-is-number >hlist-letas.csv
-	ghc-dump summarize `find ../.. -name '*-0000.cbor'` | parse-ghc-dump-summary --sort --filter 'HList/LetAsCPS/LetAsCPS' --file-is-number >hlist-letas-cps.csv
 
-	ghc-dump summarize `find ../.. -name '*-0000.cbor'` | parse-ghc-dump-summary --sort --filter 'Ap/Baseline/Baseline' --file-is-number >ap-baseline.csv
-	ghc-dump summarize `find ../.. -name '*-0000.cbor'` | parse-ghc-dump-summary --sort --filter 'Ap/Let/Let'           --file-is-number >ap-let.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/HList/Baseline/Baseline(.*)\.dump-ds$$' | sort >hlist-baseline.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/HList/LetAs/LetAs(.*)\.dump-ds$$'       | sort >hlist-letas.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/HList/LetAsCPS/LetAsCPS(.*)\.dump-ds$$' | sort >hlist-letas-cps.csv
 
-        # simpl
+	parse-dump-files --dist ../dist-newstyle --match '.*/Ap/Baseline/Baseline(.*)\.dump-ds$$'    | sort >ap-baseline.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/Ap/Let/Let(.*)\.dump-ds$$'              | sort >ap-let.csv
 
-	ghc-dump summarize `find ../.. -name '*-0001.cbor'` | parse-ghc-dump-summary --sort --filter 'HList/Baseline/Baseline' --file-is-number >simpl-hlist-baseline.csv
-	ghc-dump summarize `find ../.. -name '*-0001.cbor'` | parse-ghc-dump-summary --sort --filter 'HList/LetAs/LetAs'       --file-is-number >simpl-hlist-letas.csv
-	ghc-dump summarize `find ../.. -name '*-0001.cbor'` | parse-ghc-dump-summary --sort --filter 'HList/LetAsCPS/LetAsCPS' --file-is-number >simpl-hlist-letas-cps.csv
+	# simpl
 
-	ghc-dump summarize `find ../.. -name '*-0001.cbor'` | parse-ghc-dump-summary --sort --filter 'Ap/Baseline/Baseline' --file-is-number >simpl-ap-baseline.csv
-	ghc-dump summarize `find ../.. -name '*-0001.cbor'` | parse-ghc-dump-summary --sort --filter 'Ap/Let/Let'           --file-is-number >simpl-ap-let.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/HList/Baseline/Baseline(.*)\.dump-simpl$$' | sort >simpl-hlist-baseline.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/HList/LetAs/LetAs(.*)\.dump-simpl$$'       | sort >simpl-hlist-letas.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/HList/LetAsCPS/LetAsCPS(.*)\.dump-simpl$$' | sort >simpl-hlist-letas-cps.csv
+
+	parse-dump-files --dist ../dist-newstyle --match '.*/Ap/Baseline/Baseline(.*)\.dump-simpl$$'    | sort >simpl-ap-baseline.csv
+	parse-dump-files --dist ../dist-newstyle --match '.*/Ap/Let/Let(.*)\.dump-simpl$$'              | sort >simpl-ap-let.csv
+
 images:
 	gnuplot benchmarks.gnuplot
+
+clean:
+	rm -f *.csv *.png
