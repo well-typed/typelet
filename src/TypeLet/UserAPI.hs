@@ -88,6 +88,7 @@ data LetT (a :: k) where
 --
 -- This introduces a type-level let binding @x = t@.
 letT :: Proxy a -> LetT a
+{-# NOINLINE letT #-}
 letT p = LetT p
 
 -- | CPS form of 'letT'
@@ -95,6 +96,7 @@ letT p = LetT p
 -- While this is more convenient to use, the @r@ parameter itself requires
 -- careful thought.
 letT' :: forall r a. Proxy a -> (forall b. Let b a => Proxy b -> r) -> r
+{-# NOINLINE letT' #-}
 letT' pa k = case letT pa of LetT pb -> k pb
 
 -- | Used together with 'letAs' to pair a type-level let binding with a cast
@@ -114,11 +116,12 @@ data LetAs f (a :: k) where
 -- not useful; instead, we go from a term @e :: f t@ to a term @e :: f x@,
 -- let-binding the type index @t@ but not the functor @f@.
 letAs :: f a -> LetAs f a
+{-# NOINLINE letAs #-}
 letAs x = LetAs x
 
 -- | CPS form of 'letAs'
 --
 -- See also comments for 'letT''.
 letAs' :: forall r f a. f a -> (forall b. Let b a => f b -> r) -> r
+{-# NOINLINE letAs' #-}
 letAs' fa k = case letAs fa of LetAs fb -> k fb
-
