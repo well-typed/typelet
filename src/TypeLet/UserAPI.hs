@@ -68,6 +68,10 @@ class Equal (a :: k) (b :: k)
 --
 -- See comments for 'Equal'.
 castEqual :: Equal a b => a -> b
+-- Implementation note: marking this as NOINLINE in an attempt to make sure that
+-- @unsafeCoerce@ does not escape the scope of the evidence for @Equal@ (which,
+-- even though trivial, at least records the full time of the LHS and RHS).
+{-# NOINLINE castEqual #-}
 castEqual = unsafeCoerce
 
 {-------------------------------------------------------------------------------
